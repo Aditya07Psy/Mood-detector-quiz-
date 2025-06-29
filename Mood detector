@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mood Detector Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #dfe9f3, #ffffff);
+      padding: 20px;
+    }
+    .quiz-container {
+      max-width: 700px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .question {
+      margin-bottom: 25px;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    .options input[type="radio"] {
+      margin-right: 10px;
+    }
+    .options label:hover {
+      background: #e0e0e0;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+      font-size: 1em;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #result {
+      margin-top: 30px;
+      font-weight: bold;
+      font-size: 1.5em;
+      text-align: center;
+      color: #333;
+    }
+    #restartBtn {
+      display: none;
+      background: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h2>How Are You Feeling? (Mood Detector Quiz)</h2>
+    <form id="quizForm">
+      <div id="questions"></div>
+      <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+    <button id="restartBtn">Retake Quiz</button>
+  </div>
+
+  <script>
+    const questions = [
+      { text: "How did you sleep last night?", options: [
+        { text: "Great!", mood: { happy: 2, motivated: 1 } },
+        { text: "Not much", mood: { tired: 2, anxious: 1 } },
+        { text: "Had nightmares", mood: { anxious: 2, sad: 1 } },
+        { text: "Slept too long", mood: { tired: 2, sad: 1 } },
+      ] },
+      { text: "How do you feel about today?", options: [
+        { text: "Excited", mood: { happy: 2 } },
+        { text: "Nervous", mood: { anxious: 2 } },
+        { text: "Meh", mood: { tired: 2 } },
+        { text: "Angry", mood: { angry: 2 } },
+      ] },
+      { text: "What's your energy level right now?", options: [
+        { text: "High and ready to go!", mood: { motivated: 2 } },
+        { text: "Low, just dragging myself", mood: { tired: 2 } },
+        { text: "Buzzing but uneasy", mood: { anxious: 2 } },
+        { text: "Zero energy", mood: { sad: 2 } },
+      ] },
+      { text: "How’s your appetite been?", options: [
+        { text: "Normal", mood: { happy: 1 } },
+        { text: "Not eating much", mood: { sad: 2 } },
+        { text: "Eating too much", mood: { anxious: 1, tired: 1 } },
+        { text: "Skipping meals", mood: { anxious: 2 } },
+      ] },
+      { text: "How do you feel around people today?", options: [
+        { text: "Social and chatty", mood: { happy: 2 } },
+        { text: "Avoiding everyone", mood: { sad: 2 } },
+        { text: "Anxious and overthinking", mood: { anxious: 2 } },
+        { text: "Easily irritated", mood: { angry: 2 } },
+      ] },
+      { text: "What's been on your mind most?", options: [
+        { text: "Good memories", mood: { happy: 2 } },
+        { text: "Worries and what-ifs", mood: { anxious: 2 } },
+        { text: "Fatigue and rest", mood: { tired: 2 } },
+        { text: "Negative self-talk", mood: { sad: 2 } },
+      ] },
+      { text: "How easily annoyed have you been?", options: [
+        { text: "Not at all", mood: { happy: 1 } },
+        { text: "A little bit", mood: { anxious: 1 } },
+        { text: "Very easily", mood: { angry: 2 } },
+        { text: "I’ve avoided people to prevent it", mood: { sad: 2 } },
+      ] },
+      { text: "What best describes your focus today?", options: [
+        { text: "Clear and sharp", mood: { motivated: 2 } },
+        { text: "Foggy", mood: { tired: 2 } },
+        { text: "Distracted and jumpy", mood: { anxious: 2 } },
+        { text: "No interest in anything", mood: { sad: 2 } },
+      ] },
+      { text: "What’s your body feeling like?", options: [
+        { text: "Light and calm", mood: { happy: 2 } },
+        { text: "Tense or tight", mood: { anxious: 2 } },
+        { text: "Heavy and slow", mood: { tired: 2 } },
+        { text: "Lethargic or achy", mood: { sad: 2 } },
+      ] },
+      { text: "Have you felt any joy today?", options: [
+        { text: "Lots", mood: { happy: 2 } },
+        { text: "A little", mood: { motivated: 1 } },
+        { text: "Not really", mood: { tired: 1, sad: 1 } },
+        { text: "None at all", mood: { sad: 2 } },
+      ] },
+      { text: "How do you feel about tomorrow?", options: [
+        { text: "Hopeful", mood: { happy: 2 } },
+        { text: "Uncertain", mood: { anxious: 2 } },
+        { text: "Dread", mood: { sad: 2 } },
+        { text: "Too tired to think", mood: { tired: 2 } },
+      ] },
+      { text: "Which best describes your current state?", options: [
+        { text: "Focused", mood: { motivated: 2 } },
+        { text: "Restless", mood: { anxious: 2 } },
+        { text: "Unmotivated", mood: { tired: 2 } },
+        { text: "Emotional", mood: { sad: 2 } },
+      ] },
+      { text: "Have you been kind to yourself today?", options: [
+        { text: "Yes, totally", mood: { happy: 2 } },
+        { text: "Trying to be", mood: { motivated: 1 } },
+        { text: "Not really", mood: { sad: 2 } },
+        { text: "Being hard on myself", mood: { anxious: 2 } },
+      ] },
+      { text: "Pick the word that resonates most now:", options: [
+        { text: "Peace", mood: { happy: 2 } },
+        { text: "Tension", mood: { anxious: 2 } },
+        { text: "Fatigue", mood: { tired: 2 } },
+        { text: "Disconnection", mood: { sad: 2 } },
+      ] },
+      { text: "What do you wish you could do right now?", options: [
+        { text: "Hug someone", mood: { sad: 2 } },
+        { text: "Go on a walk", mood: { happy: 1, motivated: 1 } },
+        { text: "Sleep", mood: { tired: 2 } },
+        { text: "Cry or scream", mood: { angry: 2, sad: 1 } },
+      ] },
+      { text: "Have you cried recently?", options: [
+        { text: "Yes, often", mood: { sad: 2 } },
+        { text: "Once or twice", mood: { sad: 1 } },
+        { text: "Not at all", mood: { happy: 1 } },
+        { text: "I wanted to but held back", mood: { anxious: 2 } },
+      ] },
+      { text: "Do you feel understood by others?", options: [
+        { text: "Yes", mood: { happy: 2 } },
+        { text: "Not really", mood: { sad: 2 } },
+        { text: "I don’t talk about my feelings", mood: { anxious: 1 } },
+        { text: "I feel disconnected", mood: { sad: 2 } },
+      ] },
+      { text: "How is your motivation to do tasks?", options: [
+        { text: "Very motivated", mood: { motivated: 2 } },
+        { text: "Somewhat", mood: { tired: 1 } },
+        { text: "Not motivated at all", mood: { sad: 2 } },
+        { text: "Overwhelmed", mood: { anxious: 2 } },
+      ] }
+    ];
+
+    const moodEmojis = {
+      happy: "😊", sad: "😢", anxious: "😰", tired: "😴", motivated: "💪", angry: "😠"
+    };
+    const moodColors = {
+      happy: "#00b894", sad: "#6c5ce7", anxious: "#fdcb6e",
+      tired: "#b2bec3", motivated: "#0984e3", angry: "#d63031"
+    };
+
+    const questionContainer = document.getElementById("questions");
+    questions.forEach((q, index) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `<p><strong>Q${index + 1}:</strong> ${q.text}</p>`;
+      q.options.forEach((opt, i) => {
+        div.innerHTML += `
+          <div class="options">
+            <label><input type="radio" name="q${index}" value='${JSON.stringify(opt.mood)}' required> ${opt.text}</label>
+          </div>`;
+      });
+      questionContainer.appendChild(div);
+    });
+
+    document.getElementById("quizForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = new FormData(this);
+      const moods = {};
+      for (let [key, value] of data.entries()) {
+        const moodObj = JSON.parse(value);
+        for (let mood in moodObj) {
+          moods[mood] = (moods[mood] || 0) + moodObj[mood];
+        }
+      }
+
+      const totalAnswered = new Set([...data.keys()]).size;
+      if (totalAnswered < questions.length) {
+        alert("Please answer all questions.");
+        return;
+      }
+
+      const sortedMoods = Object.entries(moods).sort((a, b) => b[1] - a[1]);
+      const topScore = sortedMoods[0][1];
+      const topMoods = sortedMoods.filter(([_, score]) => score === topScore).map(([m]) => m);
+
+      // Store in localStorage
+      const moodHistory = JSON.parse(localStorage.getItem("moodHistory") || "[]");
+      moodHistory.push({ date: new Date().toLocaleString(), moods: topMoods });
+      localStorage.setItem("moodHistory", JSON.stringify(moodHistory));
+
+      document.getElementById("result").innerHTML =
+        `You seem to be feeling: <span style="color:${moodColors[topMoods[0]] || '#333'}">` +
+        `${topMoods.map(m => m.toUpperCase() + ' ' + (moodEmojis[m] || '')).join(" & ")}</span> today.`;
+
+      document.getElementById("restartBtn").style.display = "block";
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", () => location.reload());
+  </script>
+</body>
+</html>
